@@ -7,5 +7,5 @@ main = "workers/email-receiver.ts"
 [[d1_databases]]
 binding = "DB"
 migrations_dir = "drizzle"
-database_name = "moemail"
-database_id = "c0a6714c-b51f-4664-9fdb-f6ba36f3968e"
+database_name = ""
+database_id = ""
