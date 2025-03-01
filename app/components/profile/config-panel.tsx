@@ -13,11 +13,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { EMAIL_CONFIG } from "@/config"
 
 export function ConfigPanel() {
   const [defaultRole, setDefaultRole] = useState<string>("")
   const [emailDomains, setEmailDomains] = useState<string>("")
   const [adminContact, setAdminContact] = useState<string>("")
+  const [maxEmails, setMaxEmails] = useState<string>(EMAIL_CONFIG.MAX_ACTIVE_EMAILS.toString())
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
 
@@ -31,10 +33,14 @@ export function ConfigPanel() {
     if (res.ok) {
       const data = await res.json() as { 
         defaultRole: Exclude<Role, typeof ROLES.EMPEROR>,
-        emailDomains: string
+        emailDomains: string,
+        adminContact: string,
+        maxEmails: string
       }
       setDefaultRole(data.defaultRole)
       setEmailDomains(data.emailDomains)
+      setAdminContact(data.adminContact)
+      setMaxEmails(data.maxEmails || EMAIL_CONFIG.MAX_ACTIVE_EMAILS.toString())
     }
   }
 
@@ -47,7 +53,8 @@ export function ConfigPanel() {
         body: JSON.stringify({ 
           defaultRole, 
           emailDomains,
-          adminContact 
+          adminContact,
+          maxEmails: maxEmails || EMAIL_CONFIG.MAX_ACTIVE_EMAILS.toString()
         }),
       })
 
@@ -108,6 +115,20 @@ export function ConfigPanel() {
               value={adminContact}
               onChange={(e) => setAdminContact(e.target.value)}
               placeholder="如: 微信号、邮箱等"
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <span className="text-sm">最大邮箱数量:</span>
+          <div className="flex-1">
+            <Input 
+              type="number"
+              min="1"
+              max="100"
+              value={maxEmails}
+              onChange={(e) => setMaxEmails(e.target.value)}
+              placeholder={`默认为 ${EMAIL_CONFIG.MAX_ACTIVE_EMAILS}`}
             />
           </div>
         </div>

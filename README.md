@@ -15,6 +15,7 @@
   <a href="#部署">部署</a> •
   <a href="#邮箱域名配置">邮箱域名配置</a> •
   <a href="#权限系统">权限系统</a> •
+  <a href="#系统设置">系统设置</a> •
   <a href="#Webhook 集成">Webhook 集成</a> •
   <a href="#OpenAPI">OpenAPI</a> •
   <a href="#环境变量">环境变量</a> •
@@ -328,8 +329,18 @@ pnpm deploy:cleanup
 - **Webhook 管理**：配置邮件通知的 Webhook
 - **API Key 管理**：创建和管理 API 访问密钥
 - **用户管理**：升降用户角色
-- **系统配置**：管理系统全局设置
+- **系统设置**：管理系统全局设置
 
+## 系统设置
+
+系统设置存储在 Cloudflare KV 中，包括以下内容：
+
+- `DEFAULT_ROLE`: 新注册用户默认角色，可选值为 `CIVILIAN`、`KNIGHT`、`DUKE`
+- `EMAIL_DOMAINS`: 支持的邮箱域名，多个域名用逗号分隔
+- `ADMIN_CONTACT`: 管理员联系方式
+- `MAX_EMAILS`: 每个用户可创建的最大邮箱数量
+
+**皇帝**角色可以在个人中心页面设置
 
 ## Webhook 集成
 

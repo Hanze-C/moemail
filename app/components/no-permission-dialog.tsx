@@ -2,10 +2,10 @@
 
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
-import { useAdminContact } from "@/hooks/use-admin-contact"
+import { useConfig } from "@/hooks/use-config"
 export function NoPermissionDialog() {
   const router = useRouter()
-  const { adminContact } = useAdminContact()
+  const { config } = useConfig()
 
   return (
     <div className="fixed inset-0 bg-background/50 backdrop-blur-sm z-50">
@@ -15,8 +15,8 @@ export function NoPermissionDialog() {
             <h1 className="text-xl md:text-2xl font-bold">权限不足</h1>
             <p className="text-sm md:text-base text-muted-foreground">你没有权限访问此页面，请联系网站管理员</p>
             {
-              adminContact && (
-                <p className="text-sm md:text-base text-muted-foreground">管理员联系方式：{adminContact}</p>
+              config?.adminContact && (
+                <p className="text-sm md:text-base text-muted-foreground">管理员联系方式：{config.adminContact}</p>
               )
             }
             <Button 

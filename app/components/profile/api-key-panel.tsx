@@ -20,7 +20,7 @@ import { Label } from "@/components/ui/label"
 import { useCopy } from "@/hooks/use-copy"
 import { useRolePermission } from "@/hooks/use-role-permission"
 import { PERMISSIONS } from "@/lib/permissions"
-import { useAdminContact } from "@/hooks/use-admin-contact"
+import { useConfig } from "@/hooks/use-config"
 
 type ApiKey = {
   id: string
@@ -68,7 +68,7 @@ export function ApiKeyPanel() {
     }
   }, [canManageApiKey])
 
-  const { adminContact } = useAdminContact()
+  const { config } = useConfig()
 
   const createApiKey = async () => {
     if (!newKeyName.trim()) return
@@ -248,8 +248,8 @@ export function ApiKeyPanel() {
             <p>需要公爵或更高权限才能管理 API Key</p>
             <p className="mt-2">请联系网站管理员升级您的角色</p>
             {
-              adminContact && (
-                <p className="mt-2">管理员联系方式：{adminContact}</p>
+              config?.adminContact && (
+                <p className="mt-2">管理员联系方式：{config.adminContact}</p>
               )
             }
           </div>

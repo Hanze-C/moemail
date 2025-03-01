@@ -52,6 +52,15 @@ export async function assignRoleToUser(db: Db, userId: string, roleId: string) {
     })
 }
 
+export async function getUserRole(userId: string) {
+  const db = createDb()
+  const userRoleRecords = await db.query.userRoles.findMany({
+    where: eq(userRoles.userId, userId),
+    with: { role: true },
+  })
+  return userRoleRecords[0].role.name
+}
+
 export async function checkPermission(permission: Permission) {
   const session = await auth()
   if (!session?.user?.id) return false
