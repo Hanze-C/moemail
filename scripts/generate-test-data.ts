@@ -1,8 +1,7 @@
 import { drizzle } from 'drizzle-orm/d1'
-import { emails, messages } from '../app/lib/schema'
+import { emails, messages, users } from '../app/lib/schema'
 import { nanoid } from 'nanoid'
-
-const TEST_USER_ID = '4e4c1d5d-a3c9-407a-8808-2a2424b38c62'
+import { eq } from 'drizzle-orm'
 
 interface Env {
   DB: D1Database
@@ -12,16 +11,44 @@ const MAX_EMAIL_COUNT = 5
 const MAX_MESSAGE_COUNT = 50
 const BATCH_SIZE = 10 // SQLite 变量限制
 
-async function generateTestData(env: Env) {
+async function getUserId(db: ReturnType<typeof drizzle>, identifier: string): Promise<string | null> {
+  // 尝试通过 email 查找用户
+  let user = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, identifier))
+    .limit(1)
+    .then(rows => rows[0])
+
+  // 如果没找到，尝试通过 username 查找
+  if (!user) {
+    user = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, identifier))
+      .limit(1)
+      .then(rows => rows[0])
+  }
+
+  return user?.id || null
+}
+
+async function generateTestData(env: Env, userIdentifier: string) {
   const db = drizzle(env.DB)
   const now = new Date()
 
   try {
+    // 获取用户 ID
+    const userId = await getUserId(db, userIdentifier)
+    if (!userId) {
+      throw new Error(`未找到用户: ${userIdentifier}`)
+    }
+
     // 生成测试邮箱
     const testEmails = Array.from({ length: MAX_EMAIL_COUNT }).map(() => ({
       id: crypto.randomUUID(),
       address: `${nanoid(6)}@moemail.app`,
-      userId: TEST_USER_ID,
+      userId: userId,
       createdAt: now,
       expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000),
     }))
@@ -66,7 +93,14 @@ async function generateTestData(env: Env) {
 export default {
   async fetch(request: Request, env: Env) {
     if (request.method === 'GET') {
-      await generateTestData(env)
+      const url = new URL(request.url)
+      const userIdentifier = url.searchParams.get('user')
+      
+      if (!userIdentifier) {
+        return new Response('Missing user parameter', { status: 400 })
+      }
+
+      await generateTestData(env, userIdentifier)
       return new Response('Test data generated successfully', { status: 200 })
     }
     return new Response('Method not allowed', { status: 405 })

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { Loader2 } from "lucide-react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
+import { useTheme } from "next-themes"
 
 interface Message {
   id: string
@@ -27,6 +28,7 @@ export function MessageView({ emailId, messageId }: MessageViewProps) {
   const [loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState<ViewMode>("html")
   const iframeRef = useRef<HTMLIFrameElement>(null)
+  const { theme } = useTheme()
 
   useEffect(() => {
     const fetchMessage = async () => {
@@ -47,8 +49,7 @@ export function MessageView({ emailId, messageId }: MessageViewProps) {
     fetchMessage()
   }, [emailId, messageId])
 
-  // 处理 iframe 内容
-  useEffect(() => {
+  const updateIframeContent = () => {
     if (viewMode === "html" && message?.html && iframeRef.current) {
       const iframe = iframeRef.current
       const doc = iframe.contentDocument || iframe.contentWindow?.document
@@ -66,8 +67,8 @@ export function MessageView({ emailId, messageId }: MessageViewProps) {
                   padding: 0;
                   min-height: 100%;
                   font-family: system-ui, -apple-system, sans-serif;
-                  color: ${document.documentElement.classList.contains('dark') ? '#fff' : '#000'};
-                  background: transparent;
+                  color: ${theme === 'dark' ? '#fff' : '#000'};
+                  background: ${theme === 'dark' ? '#1a1a1a' : '#fff'};
                 }
                 body {
                   padding: 20px;
@@ -88,21 +89,21 @@ export function MessageView({ emailId, messageId }: MessageViewProps) {
                   background: transparent;
                 }
                 ::-webkit-scrollbar-thumb {
-                  background: ${document.documentElement.classList.contains('dark') 
-                    ? 'rgba(130, 109, 217, 0.3)' 
+                  background: ${theme === 'dark'
+                    ? 'rgba(130, 109, 217, 0.3)'
                     : 'rgba(130, 109, 217, 0.2)'};
                   border-radius: 9999px;
                   transition: background-color 0.2s;
                 }
                 ::-webkit-scrollbar-thumb:hover {
-                  background: ${document.documentElement.classList.contains('dark')
+                  background: ${theme === 'dark'
                     ? 'rgba(130, 109, 217, 0.5)'
                     : 'rgba(130, 109, 217, 0.4)'};
                 }
                 /* Firefox 滚动条 */
                 * {
                   scrollbar-width: thin;
-                  scrollbar-color: ${document.documentElement.classList.contains('dark')
+                  scrollbar-color: ${theme === 'dark'
                     ? 'rgba(130, 109, 217, 0.3) transparent'
                     : 'rgba(130, 109, 217, 0.2) transparent'};
                 }
@@ -139,7 +140,12 @@ export function MessageView({ emailId, messageId }: MessageViewProps) {
         }
       }
     }
-  }, [message?.html, viewMode])
+  }
+
+  // 监听主题变化和内容变化
+  useEffect(() => {
+    updateIframeContent()
+  }, [message?.html, viewMode, theme])
 
   if (loading) {
     return (

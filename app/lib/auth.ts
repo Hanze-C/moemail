@@ -13,6 +13,7 @@ import { generateAvatarUrl } from "./avatar"
 
 const ROLE_DESCRIPTIONS: Record<Role, string> = {
   [ROLES.EMPEROR]: "皇帝（网站所有者）",
+  [ROLES.DUKE]: "公爵（超级用户）",
   [ROLES.KNIGHT]: "骑士（高级用户）",
   [ROLES.CIVILIAN]: "平民（普通用户）",
 }
@@ -49,6 +50,15 @@ export async function assignRoleToUser(db: Db, userId: string, roleId: string) {
       userId,
       roleId,
     })
+}
+
+export async function getUserRole(userId: string) {
+  const db = createDb()
+  const userRoleRecords = await db.query.userRoles.findMany({
+    where: eq(userRoles.userId, userId),
+    with: { role: true },
+  })
+  return userRoleRecords[0].role.name
 }
 
 export async function checkPermission(permission: Permission) {
