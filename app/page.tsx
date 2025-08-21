@@ -16,7 +16,7 @@ export default async function Home() {
         <main className="h-full">
           <div className="h-[calc(100vh-4rem)] flex flex-col items-center justify-center text-center px-4 relative">
             <div className="absolute inset-0 -z-10 bg-grid-primary/5" />
-
+            
             <div className="w-full max-w-3xl mx-auto space-y-12 py-8">
               <div className="space-y-4">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-wider">
@@ -25,8 +25,26 @@ export default async function Home() {
                   </span>
                 </h1>
                 <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 tracking-wide">
-                  萌萌哒自部署邮箱服务
+                  萌萌哒临时邮箱服务
                 </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-4 sm:px-0">
+                <FeatureCard
+                  icon={<Shield className="w-5 h-5" />}
+                  title="隐私保护"
+                  description="保护您的真实邮箱地址"
+                />
+                <FeatureCard
+                  icon={<Mail className="w-5 h-5" />}
+                  title="即时收件"
+                  description="实时接收邮件通知"
+                />
+                <FeatureCard
+                  icon={<Clock className="w-5 h-5" />}
+                  title="自动过期"
+                  description="到期自动失效"
+                />
               </div>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 px-4 sm:px-0">
