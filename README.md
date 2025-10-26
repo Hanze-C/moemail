@@ -9,6 +9,7 @@
 
 <p align="center">
   <a href="#在线演示">在线演示</a> •
+  <a href="#文档">文档</a> •
   <a href="#特性">特性</a> •
   <a href="#技术栈">技术栈</a> •
   <a href="#本地运行">本地运行</a> •
@@ -37,6 +38,11 @@
 
 ![个人中心](https://pic.otaku.ren/20241227/AQADVsIxG7OzcFd-.jpg "个人中心")
 
+## 文档
+**完整文档**: [https://docs.moemail.app](https://docs.moemail.app)
+
+文档站点包含详细的使用指南、API 文档、部署教程等完整信息。
+
 ## 特性
 
 - 🔒 **隐私保护**：保护您的真实邮箱地址，远离垃圾邮件和不必要的订阅
@@ -52,6 +58,7 @@
 - 🔔 **Webhook 通知**：支持通过 webhook 接收新邮件通知
 - 🛡️ **权限系统**：支持基于角色的权限控制系统
 - 🔑 **OpenAPI**：支持通过 API Key 访问 OpenAPI
+- 🌍 **多语言支持**：支持中文和英文界面，可自由切换
 
 ## 技术栈
 
@@ -64,6 +71,7 @@
 - **邮件处理**: [Cloudflare Email Workers](https://developers.cloudflare.com/email-routing/)
 - **类型安全**: [TypeScript](https://www.typescriptlang.org/)
 - **ORM**: [Drizzle ORM](https://orm.drizzle.team/)
+- **国际化**: [next-intl](https://next-intl-docs.vercel.app/) 支持多语言
 
 ## 本地运行
 
@@ -564,6 +572,159 @@ GET /api/emails/{emailId}/{messageId}
 - `html`: 邮件HTML内容
 - `received_at`: 接收时间（时间戳）
 
+#### 创建邮箱分享链接
+```http
+POST /api/emails/{emailId}/share
+Content-Type: application/json
+
+{
+  "expiresIn": 86400000
+}
+```
+参数说明：
+- `emailId`: 邮箱的唯一标识符，必填
+- `expiresIn`: 分享链接有效期（毫秒），0 表示永久有效，可选
+
+返回响应：
+```json
+{
+  "id": "share-uuid-123",
+  "emailId": "email-uuid-123",
+  "token": "abc123def456",
+  "expiresAt": "2024-01-02T12:00:00.000Z",
+  "createdAt": "2024-01-01T12:00:00.000Z"
+}
+```
+响应字段说明：
+- `id`: 分享记录的唯一标识符
+- `emailId`: 关联的邮箱 ID
+- `token`: 分享链接的访问令牌
+- `expiresAt`: 分享链接过期时间，null 表示永久有效
+- `createdAt`: 创建时间
+
+分享链接访问地址：`https://your-domain.com/shared/{token}`
+
+#### 获取邮箱的所有分享链接
+```http
+GET /api/emails/{emailId}/share
+```
+参数说明：
+- `emailId`: 邮箱的唯一标识符，必填
+
+返回响应：
+```json
+{
+  "shares": [
+    {
+      "id": "share-uuid-123",
+      "emailId": "email-uuid-123",
+      "token": "abc123def456",
+      "expiresAt": "2024-01-02T12:00:00.000Z",
+      "createdAt": "2024-01-01T12:00:00.000Z"
+    }
+  ],
+  "total": 1
+}
+```
+响应字段说明：
+- `shares`: 分享链接列表数组
+- `total`: 分享链接总数
+
+#### 删除邮箱分享链接
+```http
+DELETE /api/emails/{emailId}/share/{shareId}
+```
+参数说明：
+- `emailId`: 邮箱的唯一标识符，必填
+- `shareId`: 分享记录的唯一标识符，必填
+
+返回响应：
+```json
+{
+  "success": true
+}
+```
+响应字段说明：
+- `success`: 删除操作是否成功
+
+#### 创建邮件分享链接
+```http
+POST /api/emails/{emailId}/messages/{messageId}/share
+Content-Type: application/json
+
+{
+  "expiresIn": 86400000
+}
+```
+参数说明：
+- `emailId`: 邮箱的唯一标识符，必填
+- `messageId`: 邮件的唯一标识符，必填
+- `expiresIn`: 分享链接有效期（毫秒），0 表示永久有效，可选
+
+返回响应：
+```json
+{
+  "id": "share-uuid-456",
+  "messageId": "message-uuid-789",
+  "token": "xyz789ghi012",
+  "expiresAt": "2024-01-02T12:00:00.000Z",
+  "createdAt": "2024-01-01T12:00:00.000Z"
+}
+```
+响应字段说明：
+- `id`: 分享记录的唯一标识符
+- `messageId`: 关联的邮件 ID
+- `token`: 分享链接的访问令牌
+- `expiresAt`: 分享链接过期时间，null 表示永久有效
+- `createdAt`: 创建时间
+
+分享链接访问地址：`https://your-domain.com/shared/message/{token}`
+
+#### 获取邮件的所有分享链接
+```http
+GET /api/emails/{emailId}/messages/{messageId}/share
+```
+参数说明：
+- `emailId`: 邮箱的唯一标识符，必填
+- `messageId`: 邮件的唯一标识符，必填
+
+返回响应：
+```json
+{
+  "shares": [
+    {
+      "id": "share-uuid-456",
+      "messageId": "message-uuid-789",
+      "token": "xyz789ghi012",
+      "expiresAt": "2024-01-02T12:00:00.000Z",
+      "createdAt": "2024-01-01T12:00:00.000Z"
+    }
+  ],
+  "total": 1
+}
+```
+响应字段说明：
+- `shares`: 分享链接列表数组
+- `total`: 分享链接总数
+
+#### 删除邮件分享链接
+```http
+DELETE /api/emails/{emailId}/messages/{messageId}/share/{shareId}
+```
+参数说明：
+- `emailId`: 邮箱的唯一标识符，必填
+- `messageId`: 邮件的唯一标识符，必填
+- `shareId`: 分享记录的唯一标识符，必填
+
+返回响应：
+```json
+{
+  "success": true
+}
+```
+响应字段说明：
+- `success`: 删除操作是否成功
+
 ### 使用示例
 
 使用 curl 创建临时邮箱：
@@ -586,6 +747,32 @@ const res = await fetch('https://your-domain.com/api/emails/your-email-id', {
   }
 });
 const data = await res.json();
+```
+
+使用 curl 创建邮箱分享链接：
+```bash
+curl -X POST https://your-domain.com/api/emails/your-email-id/share \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "expiresIn": 86400000
+  }'
+```
+
+使用 JavaScript 创建邮件分享链接：
+```javascript
+const res = await fetch('https://your-domain.com/api/emails/your-email-id/messages/your-message-id/share', {
+  method: 'POST',
+  headers: {
+    'X-API-Key': 'YOUR_API_KEY',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    expiresIn: 0  // 永久有效
+  })
+});
+const data = await res.json();
+console.log('分享链接:', `https://your-domain.com/shared/message/${data.token}`);
 ```
 
 ## 环境变量
@@ -654,3 +841,13 @@ const data = await res.json();
 <br />
 <br />
 <a href="https://www.buymeacoffee.com/beilunyang" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="width: 400px;" ></a>
+
+## Star History
+
+<a href="https://www.star-history.com/#beilunyang/moemail&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=beilunyang/moemail&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=beilunyang/moemail&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=beilunyang/moemail&type=Date" />
+ </picture>
+</a>
