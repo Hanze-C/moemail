@@ -30,6 +30,7 @@
   <a href="#sending-emails">Sending Emails</a> •
   <a href="#webhook-integration">Webhook Integration</a> •
   <a href="#openapi">OpenAPI</a> •
+  <a href="#cli-tool">CLI Tool</a> •
   <a href="#environment-variables">Environment Variables</a> •
   <a href="#github-oauth-app-configuration">Github OAuth Config</a> •
   <a href="#google-oauth-app-configuration">Google OAuth Config</a> •
@@ -68,6 +69,7 @@ The documentation site contains detailed usage guides, API documentation, deploy
 - 🔔 **Webhook Notification**: Support receiving new email notifications via webhook
 - 🛡️ **Permission System**: Role-based access control system
 - 🔑 **OpenAPI**: Support accessing OpenAPI via API Key
+- 🤖 **Agent-first CLI**: CLI tool designed for AI agents to automate email workflows
 - 🌍 **Multi-language Support**: Supports Chinese and English interfaces, freely switchable
 
 ## Tech Stack
@@ -532,6 +534,69 @@ GET /api/emails/{emailId}/messages/{messageId}/share
 ```http
 DELETE /api/emails/{emailId}/messages/{messageId}/share/{shareId}
 ```
+
+## CLI Tool
+
+MoeMail provides an agent-first CLI tool for AI agents and automation workflows.
+
+### Install
+
+```bash
+npm i -g @moemail/cli
+```
+
+### Quick Start
+
+```bash
+# Configure API endpoint and key
+moemail config set api-url https://moemail.app
+moemail config set api-key YOUR_API_KEY
+
+# Create temporary email
+moemail create --domain moemail.app --expiry 1h --json
+
+# Wait for new messages (polling)
+moemail wait --email-id <id> --timeout 120 --json
+
+# Read message content
+moemail read --email-id <id> --message-id <id> --json
+
+# Delete email
+moemail delete --email-id <id>
+```
+
+### Agent Workflow
+
+A typical AI agent verification flow in 3 tool calls:
+
+```bash
+# 1. Create mailbox
+EMAIL=$(moemail create --domain moemail.app --expiry 1h --json)
+EMAIL_ID=$(echo $EMAIL | jq -r '.id')
+ADDRESS=$(echo $EMAIL | jq -r '.address')
+
+# 2. Wait for verification email
+MSG=$(moemail wait --email-id $EMAIL_ID --timeout 120 --json)
+MSG_ID=$(echo $MSG | jq -r '.messageId')
+
+# 3. Read content, extract verification code
+CONTENT=$(moemail read --email-id $EMAIL_ID --message-id $MSG_ID --json)
+```
+
+### AI Agent Skill
+
+Install the built-in skill so AI agents (Claude Code, Codex, etc.) automatically know how to use MoeMail:
+
+```bash
+# Auto-detect installed agent platforms and install
+moemail skill install
+
+# Or specify a platform
+moemail skill install --platform claude
+moemail skill install --platform codex
+```
+
+For full documentation, see [packages/cli/README.md](packages/cli/README.md).
 
 ## Environment Variables
 

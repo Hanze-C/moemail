@@ -19,7 +19,10 @@ export async function middleware(request: Request) {
   const pathname = url.pathname
 
   if (pathname.startsWith('/api')) {
-    if (pathname.startsWith('/api/auth')) {
+    if (
+      pathname.startsWith('/api/auth') ||
+      pathname.startsWith('/api/shared')
+    ) {
       return NextResponse.next()
     }
 
